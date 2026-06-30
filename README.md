@@ -70,7 +70,7 @@ $$
 z = x + jy
 $$
 
-其中 $x = \Re(z)$ 是實部， $y = \Im(z)$ 是虛部，$j$ 為虛數單位。對長度為 $L$ 的複數波形而言，可寫成
+其中 $x = \Re(z)$ 是實部， $y = \Im(z)$ 是虛部， $j$ 為虛數單位。對長度為 $L$ 的複數波形而言，可寫成
 
 $$
 \mathbf{r} = [r_1, r_2, \dots, r_L]^\top,
@@ -123,7 +123,7 @@ $$
 訓練時使用加權損失函數：
 
 $$
-\mathcal{L} = 0.7\,\mathrm{MSE}(\Re(\hat{\mathbf{a}}),\Re(\mathbf{a})) + 0.7\,\mathrm{MSE}(\Im(\hat{\mathbf{a}}),\Im(\mathbf{a})) + 0.2\,\mathrm{MSE}(|\hat{\mathbf{a}}|,|\mathbf{a}|) + 0.1\,\mathrm{MAE}(\hat{\mathbf{a}},\mathbf{a})
+\mathcal{L} = 0.7\cdot\mathrm{MSE}(\Re(\hat{\mathbf{a}})\cdot\Re(\mathbf{a})) + 0.7\cdot\mathrm{MSE}(\Im(\hat{\mathbf{a}})\cdot\Im(\mathbf{a})) + 0.2\cdot\mathrm{MSE}(|\hat{\mathbf{a}}|\cdot|\mathbf{a}|) + 0.1\cdot\mathrm{MAE}(\hat{\mathbf{a}}\cdot\mathbf{a})
 $$
 
 這個設計同時約束實部、虛部與幅度，提升模型在複數域中的學習效果。各項權重的含義如下：
