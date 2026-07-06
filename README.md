@@ -1026,8 +1026,3 @@ python train.py --data-dir ./data1 --mode curriculum --epochs 25
 
 ---
 
-<div align="center">
-
-**本 README 為每週階段報告版本，主要用於說明目前資料生成、訊號模型與 CVNN 架構設計。**
-
-</div>
