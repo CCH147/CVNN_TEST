@@ -4,9 +4,6 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.x-red)
-![MATLAB](https://img.shields.io/badge/MATLAB-.mat%20資料集-orange)
-![CVNN](https://img.shields.io/badge/模型-複數值神經網路-green)
-![OFDM](https://img.shields.io/badge/訊號-Hermitian--Symmetric%20OFDM-purple)
 
 **本研究利用複數值神經網路，從接收端複數波形中直接回歸結構化目標向量。**
 
@@ -34,9 +31,7 @@
 - [16. 實驗結果與初步觀察](#16-實驗結果與初步觀察)
 - [17. 專案檔案結構](#17-專案檔案結構)
 - [18. 執行方式](#18-執行方式)
-- [19. 目前進度](#19-目前進度)
-- [20. 待完成工作](#20-待完成工作)
-- [21. 結論](#21-結論)
+- [19. 待完成工作](#19-待完成工作)
 
 ---
 
@@ -47,15 +42,15 @@
 
 模型學習的映射為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?f_%5Ctheta%3A%5Cmathbb%7BC%7D%5E%7BL%7D%5Crightarrow%5Cmathbb%7BC%7D%5E%7BD%7D" alt="f_theta mapping">
-</p>
+$$
+f_\theta: \mathbb{C}^L \rightarrow \mathbb{C}^D
+$$
 
 其中：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L%3D12000%2C%5Cqquad%20D%3D19" alt="L and D">
-</p>
+$$
+L = 12000, \qquad D = 19
+$$
 
 也就是說，模型輸入為一段長度 12000 的複數接收波形，輸出為一個長度 19 的複數目標向量。
 
@@ -63,17 +58,17 @@
 
 本研究與一般實數神經網路不同，主要保留複數訊號的表示：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?r%28t%29%3Dr_I%28t%29%2Bj%5C%2Cr_Q%28t%29" alt="complex received signal">
-</p>
+$$
+r(t) = r_I(t) + j r_Q(t)
+$$
 
 其中：
 
 - `r_I(t)`：接收訊號實部
 - `r_Q(t)`：接收訊號虛部
-- $\(j\)$ ：虛數單位
+- $j$：虛數單位
 
-由於通訊訊號本質上通常包含幅度與相位資訊，因此本專案採用 CVNN，而不是將複數資料完全轉換成一般實數向量後再使用傳統多層感知器（Multilayer Perceptron, MLP）。
+由於通訊訊號本質上通常包含幅度與相位資訊，因此本專案採用pytorch中複數專用的函式並搭配傳統多層感知器（Multilayer Perceptron, MLP）實作。
 
 ---
 
@@ -107,14 +102,14 @@
 
 也就是：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7Br%7D%5Clongrightarrow%5Chat%7B%5Cmathbf%7Ba%7D%7D" alt="r to a hat">
-</p>
+$$
+\mathbf{r} \longrightarrow \hat{\mathbf{a}}
+$$
 
 其中：
 
 - `r`：接收端觀測到的複數波形
-- `â`：模型預測出的結構化目標向量
+- $\hat{\mathbf{a}}$：模型預測出的結構化目標向量
 
 ---
 
@@ -143,7 +138,6 @@
 | CVNN 訓練程式 | 已完成初版 | 使用 `train.py` |
 | 結構化損失函數 | 已完成初版 | 對應 target vector 結構 |
 | 課程式學習（Curriculum Learning） | 初步支援 | 從高 SNR 到全 SNR |
-| SNR-aware model | 已暫時移除 | 目前實驗先聚焦 High-SNR 與 All-SNR 比較 |
 
 ---
 
@@ -162,7 +156,7 @@ flowchart LR
     --> G["加入 AWGN 雜訊<br/>AWGN Channel"]
     --> H["接收波形 r(t)<br/>Received Waveform"]
     --> I["複數值神經網路<br/>CVNN"]
-    --> J["預測目標向量 â<br/>Estimated Target"]
+    --> J["預測目標向量 a_hat<br/>Estimated Target"]
 ```
 
 **圖一：系統整體流程圖**
@@ -185,7 +179,7 @@ flowchart TD
     subgraph B["模型訓練階段"]
         B1["輸入接收波形 r(t)"] 
         --> B2["複數值神經網路 CVNN"]
-        --> B3["輸出預測向量 â"]
+        --> B3["輸出預測向量 a_hat"]
         --> B4["計算結構化損失 Structured Loss"]
         --> B5["反向傳播與參數更新"]
     end
@@ -201,9 +195,9 @@ flowchart TD
 
 本專案採用加性白高斯雜訊模型（Additive White Gaussian Noise, AWGN）：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?r%28t%29%3Ds%28t%29%2Bn%28t%29" alt="received signal model">
-</p>
+$$
+r(t) = s(t) + n(t)
+$$
 
 其中：
 
@@ -217,43 +211,43 @@ flowchart TD
 
 離散時間表示為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?r%5B%5Cell%5D%3Ds%5B%5Cell%5D%2Bn%5B%5Cell%5D%2C%5Cqquad%20%5Cell%3D0%2C1%2C%5Cdots%2CL-1" alt="discrete signal model">
-</p>
+$$
+r[\ell] = s[\ell] + n[\ell], \qquad \ell = 0,1,\dots,L-1
+$$
 
 其中：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L%3D12000" alt="L equals 12000">
-</p>
+$$
+L = 12000
+$$
 
 ---
 
 神經網路的任務是根據整段接收波形：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7Br%7D%3D%5Br%5B0%5D%2Cr%5B1%5D%2C%5Cdots%2Cr%5BL-1%5D%5D%5ET%5Cin%5Cmathbb%7BC%7D%5E%7B12000%7D" alt="received vector">
-</p>
+$$
+\mathbf{r} = [r[0], r[1], \dots, r[L-1]]^T \in \mathbb{C}^{12000}
+$$
 
 回歸目標向量：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7Ba%7D%3D%5Ba_0%2Ca_1%2C%5Cdots%2Ca_%7B18%7D%5D%5ET%5Cin%5Cmathbb%7BC%7D%5E%7B19%7D" alt="target vector">
-</p>
+$$
+\mathbf{a} = [a_0, a_1, \dots, a_{18}]^T \in \mathbb{C}^{19}
+$$
 
 ---
 
 因此，模型目標為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Chat%7B%5Cmathbf%7Ba%7D%7D%3Df_%5Ctheta%28%5Cmathbf%7Br%7D%29" alt="prediction">
-</p>
+$$
+\hat{\mathbf{a}} = f_\theta(\mathbf{r})
+$$
 
 並希望：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Chat%7B%5Cmathbf%7Ba%7D%7D%5Capprox%5Cmathbf%7Ba%7D" alt="a hat approximates a">
-</p>
+$$
+\hat{\mathbf{a}} \approx \mathbf{a}
+$$
 
 ---
 
@@ -265,13 +259,13 @@ flowchart TD
 
 | 參數 | 設定值 | 說明 |
 |---|---:|---|
-| $\(N\)$ | 20 | 子載波數參數 |
-| $\(D\)$ | 19 | 目標向量維度 |
-| $\(M\)$ | 4 | QPSK |
-| $\(F_s\)$ | 3 MHz | 取樣頻率 |
-| $\(\Delta f\)$ | 250 Hz | 子載波間隔 |
-| $\(T_{sym}\)$ | 4 ms | 符號週期 |
-| $\(L\)$ | 12000 | 每個符號的取樣點 |
+| $N$ | 20 | 子載波數參數 |
+| $D$ | 19 | 目標向量維度 |
+| $M$ | 4 | QPSK |
+| $F_s$ | 3 MHz | 取樣頻率 |
+| $\Delta f$ | 250 Hz | 子載波間隔 |
+| $T_{sym}$ | 4 ms | 符號週期 |
+| $L$ | 12000 | 每個符號的取樣點 |
 | SNR | 0,5,10,15,20,25 dB | 訊雜比 |
 | samples/SNR | 3000 | 每個 SNR 的樣本數 |
 
@@ -314,9 +308,9 @@ data1/
 
 本專案的目標向量（Target Vector）並不是一般任意複數向量，而是具有固定結構。
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7Ba%7D%5Cin%5Cmathbb%7BC%7D%5E%7B19%7D" alt="a in C19">
-</p>
+$$
+\mathbf{a} \in \mathbb{C}^{19}
+$$
 
 其結構為：
 
@@ -349,9 +343,19 @@ type :   實部資訊區            結構零點     虛部資訊區
 
 數學上可寫為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7Ba%7D%3D%5Cbegin%7Bbmatrix%7D%5CRe%28x_0%29%5C%5C%20%5CRe%28x_1%29%5C%5C%20%5Cvdots%5C%5C%20%5CRe%28x_8%29%5C%5C%200%5C%5C%20j%5CIm%28x_8%29%5C%5C%20%5Cvdots%5C%5C%20j%5CIm%28x_1%29%5C%5C%20j%5CIm%28x_0%29%5Cend%7Bbmatrix%7D" alt="structured target vector">
-</p>
+$$
+\mathbf{a} = \begin{bmatrix}
+\Re(x_0) \\
+\Re(x_1) \\
+\vdots \\
+\Re(x_8) \\
+0 \\
+j\Im(x_8) \\
+\vdots \\
+j\Im(x_1) \\
+j\Im(x_0)
+\end{bmatrix}
+$$
 
 其中 `x_k` 為 QPSK symbol。
 
@@ -359,21 +363,21 @@ type :   實部資訊區            結構零點     虛部資訊區
 
 由於：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?D%3D19" alt="D equals 19">
-</p>
+$$
+D = 19
+$$
 
 為奇數，因此中間 index：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cfrac%7BD-1%7D%7B2%7D%3D9" alt="middle index">
-</p>
+$$
+\frac{D - 1}{2} = 9
+$$
 
 在目前的配對設計中不承載資訊，因此：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?a_9%3D0" alt="a9 zero">
-</p>
+$$
+a_9 = 0
+$$
 
 這個固定零點稱為 **結構性零點（structural zero）**。
 
@@ -395,15 +399,15 @@ type :   實部資訊區            結構零點     虛部資訊區
 
 Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?c_%7BN-k%7D%3Dc_k%5E%2A" alt="Hermitian symmetry">
-</p>
+$$
+c_{N-k} = c_k^*
+$$
 
 其中：
 
-- `c_k`：第 \(k\) 個子載波係數
-- `c_k*`：複數共軛
-- `N = 20`
+- $c_k$：第 $k$ 個子載波係數
+- $c_k^*$：複數共軛
+- $N = 20$
 
 ---
 
@@ -417,7 +421,7 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 │ c19 c18 ...    │                  │ ... c2 c1      │
 └───────┬────────┘                  └───────┬────────┘
         │                                   │
-        └────────── 共軛對稱配對 ───────────┘
+        └────────── 共軛對稱配對 ────────────┘
 ```
 
 **圖五：頻域 Hermitian 共軛對稱示意圖**
@@ -426,23 +430,23 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
 若頻域係數滿足：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?C%28-f%29%3DC%5E%2A%28f%29" alt="frequency conjugate symmetry">
-</p>
+$$
+C(-f) = C^*(f)
+$$
 
 則其時域訊號為實值訊號。
 
 也就是說：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?s%28t%29%5Cin%5Cmathbb%7BR%7D" alt="real-valued signal">
-</p>
+$$
+s(t) \in \mathbb{R}
+$$
 
 或在數值實作中：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5CIm%28s%28t%29%29%5Capprox%200" alt="imaginary part approximately zero">
-</p>
+$$
+\Im(s(t)) \approx 0
+$$
 
 ---
 
@@ -450,21 +454,21 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
 考慮一組共軛配對頻率：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?c_k%20e%5E%7Bj2%5Cpi%20f_k%20t%7D%2Bc_k%5E%2Ae%5E%7B-j2%5Cpi%20f_k%20t%7D" alt="conjugate pair">
-</p>
+$$
+c_k e^{j2\pi f_k t} + c_k^* e^{-j2\pi f_k t}
+$$
 
 令：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?c_k%3D%5Calpha%2Bj%5Cbeta" alt="ck alpha beta">
-</p>
+$$
+c_k = \alpha + j\beta
+$$
 
 則：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?c_k%20e%5E%7Bj2%5Cpi%20f_k%20t%7D%2Bc_k%5E%2Ae%5E%7B-j2%5Cpi%20f_k%20t%7D%3D2%5CRe%5C%7Bc_k%20e%5E%7Bj2%5Cpi%20f_k%20t%7D%5C%7D" alt="real pair proof">
-</p>
+$$
+c_k e^{j2\pi f_k t} + c_k^* e^{-j2\pi f_k t} = 2\Re\{c_k e^{j2\pi f_k t}\}
+$$
 
 因此該項一定為實數。
 
@@ -476,42 +480,42 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
 時域訊號由子載波加總而成：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?s%28t%29%3D%5Csum_%7Bk%3D0%7D%5E%7BN%7Dc_k%20e%5E%7Bj2%5Cpi%28k-N%2F2%29%5CDelta%20f%20t%7D" alt="OFDM synthesis">
-</p>
+$$
+s(t) = \sum_{k=0}^{N} c_k e^{j2\pi (k-N/2) \Delta f t}
+$$
 
 其中：
 
 | 符號 | 意義 |
 |---|---|
-| `c_k` | 第 \(k\) 個子載波係數 |
-| $\(N\)$ | 子載波參數，設定為 20 |
-| $\(\Delta f\)$ | 子載波間隔，250 Hz |
-| $\(t\)$ | 離散時間軸 |
+| $c_k$ | 第 $k$ 個子載波係數 |
+| $N$ | 子載波參數，設定為 20 |
+| $\Delta f$ | 子載波間隔，250 Hz |
+| $t$ | 離散時間軸 |
 
 ---
 
 程式中使用的時間軸為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?t%3D0%2C%5Cfrac%7B1%7D%7BF_s%7D%2C%5Cfrac%7B2%7D%7BF_s%7D%2C%5Cdots%2CT_%7Bsym%7D-%5Cfrac%7B1%7D%7BF_s%7D" alt="time axis">
-</p>
+$$
+t = 0, \frac{1}{F_s}, \frac{2}{F_s}, \dots, T_{sym} - \frac{1}{F_s}
+$$
 
 其中：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?F_s%3D3%5Ctimes10%5E6" alt="sampling rate">
-</p>
+$$
+F_s = 3 \times 10^6
+$$
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?T_%7Bsym%7D%3D%5Cfrac%7B1%7D%7B%5CDelta%20f%7D%3D0.004" alt="symbol duration">
-</p>
+$$
+T_{sym} = \frac{1}{\Delta f} = 0.004
+$$
 
 因此取樣點數為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L%3DF_sT_%7Bsym%7D%3D3%5Ctimes10%5E6%5Ctimes0.004%3D12000" alt="sample length calculation">
-</p>
+$$
+L = F_s T_{sym} = 3 \times 10^6 \times 0.004 = 12000
+$$
 
 ---
 
@@ -521,12 +525,12 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
 | 欄位 | 維度 | 型態 | 說明 |
 |---|---:|---|---|
-| `rx` | \(12000\) | complex64 | 加入雜訊後的接收訊號 |
-| `s` | \(12000\) | complex64 | 乾淨發射訊號 |
-| `a` | \(19\) | complex64 | 目標向量 |
-| `c` | \(21\) | complex64 | 子載波係數 |
-| `bits` | \(18\) | uint8 | 原始位元 |
-| `symbols` | \(9\) | complex64 | QPSK symbols |
+| `rx` | $12000$ | complex64 | 加入雜訊後的接收訊號 |
+| `s` | $12000$ | complex64 | 乾淨發射訊號 |
+| `a` | $19$ | complex64 | 目標向量 |
+| `c` | $21$ | complex64 | 子載波係數 |
+| `bits` | $18$ | uint8 | 原始位元 |
+| `symbols` | $9$ | complex64 | QPSK symbols |
 | `snr` | 1 | float32 | 對應 SNR |
 
 ---
@@ -549,13 +553,13 @@ Hermitian symmetry（Hermitian 共軛對稱）的核心條件為：
 
 其中 `rx` 與 `s` 會共同使用接收訊號 RMS 進行正規化：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?rx_%7Bnorm%7D%3D%5Cfrac%7Brx%7D%7BRMS%28rx%29%7D" alt="rx normalization">
-</p>
+$$
+rx_{norm} = \frac{rx}{RMS(rx)}
+$$
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?s_%7Bnorm%7D%3D%5Cfrac%7Bs%7D%7BRMS%28rx%29%7D" alt="s normalization">
-</p>
+$$
+s_{norm} = \frac{s}{RMS(rx)}
+$$
 
 這樣可避免不同 SNR 或不同樣本造成過大的幅度變化。
 
@@ -632,27 +636,27 @@ flowchart LR
 
 複數線性層定義為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmathbf%7By%7D%3D%5Cmathbf%7Bx%7DW%5EH%2B%5Cmathbf%7Bb%7D" alt="ComplexLinear">
-</p>
+$$
+\mathbf{y} = \mathbf{x} W^H + \mathbf{b}
+$$
 
 其中：
 
 | 符號 | 意義 |
 |---|---|
-| $\(\mathbf x\)$ | 輸入複數向量 |
-| $\(W\)$ | 複數權重矩陣 |
-| `W^H` | Hermitian transpose，共軛轉置 |
-| $\(\mathbf b\)$ | 複數偏置 |
-| $\(\mathbf y\)$ | 輸出複數向量 |
+| $\mathbf{x}$ | 輸入複數向量 |
+| $W$ | 複數權重矩陣 |
+| $W^H$ | Hermitian transpose，共軛轉置 |
+| $\mathbf{b}$ | 複數偏置 |
+| $\mathbf{y}$ | 輸出複數向量 |
 
 ---
 
 使用 `W^H` 的原因是符合訊號處理中常見的 Hermitian inner product 形式：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Clangle%20x%2Cw%5Crangle%3Dw%5EH%20x" alt="Hermitian inner product">
-</p>
+$$
+\langle x, w \rangle = w^H x
+$$
 
 此設計保留複數權重的共軛關係，使線性投影更接近通訊訊號中的匹配濾波概念。
 
@@ -662,17 +666,17 @@ flowchart LR
 
 ComplexLayerNorm 對每一筆樣本做正規化：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Cmu%3D%5Cfrac%7B1%7D%7Bd%7D%5Csum_%7Bi%3D1%7D%5E%7Bd%7Dx_i" alt="mean">
-</p>
+```math
+\mu = \frac{1}{d} \sum_{i=1}^{d} x_i
+```
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Csigma%5E2%3D%5Cfrac%7B1%7D%7Bd%7D%5Csum_%7Bi%3D1%7D%5E%7Bd%7D%7Cx_i-%5Cmu%7C%5E2" alt="variance">
-</p>
+```math
+\sigma^2 = \frac{1}{d} \sum_{i=1}^{d} |x_i - \mu|^2
+```
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Chat%7Bx%7D_i%3D%5Cfrac%7Bx_i-%5Cmu%7D%7B%5Csqrt%7B%5Csigma%5E2%2B%5Cepsilon%7D%7D" alt="layer norm">
-</p>
+```math
+\hat{x}_i = \frac{x_i - \mu}{\sqrt{\sigma^2 + \epsilon}}
+```
 
 ---
 
@@ -688,23 +692,25 @@ ComplexLayerNorm 對每一筆樣本做正規化：
 
 ModReLU 定義為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5Coperatorname%7BmodReLU%7D%28z%29%3D%5Coperatorname%7BReLU%7D%28%7Cz%7C%2Bb%29%5Cfrac%7Bz%7D%7B%7Cz%7C%2B%5Cepsilon%7D" alt="ModReLU">
-</p>
+
+$$
+\mathrm{modReLU}(z) = \mathrm{ReLU}(|z| + b) \frac{z}{|z| + \epsilon}
+$$
+
 
 其中：
 
 - `|z|`：複數幅度
 - `z / |z|`：複數相位方向
-- \(b\)：可訓練偏移量
+- $b$：可訓練偏移量
+
 
 ---
 
 一般 split-ReLU 會分別對實部與虛部做 ReLU：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?ReLU%28%5CRe%28z%29%29%2BjReLU%28%5CIm%28z%29%29" alt="split ReLU">
-</p>
+
+$\mathrm{ReLU}(\Re(z)) + j\mathrm{ReLU}(\Im(z))$
 
 此方法可能破壞複數相位。
 
@@ -716,9 +722,9 @@ ModReLU 則主要調整幅度，保留相位方向，因此更符合複數訊號
 
 若直接使用一般複數 MSE：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L_%7BMSE%7D%3D%7C%7C%5Chat%7B%5Cmathbf%7Ba%7D%7D-%5Cmathbf%7Ba%7D%7C%7C_2%5E2" alt="MSE loss">
-</p>
+
+$L_{MSE} = \|\hat{\mathbf{a}} - \mathbf{a}\|_2^2$
+
 
 會忽略 target vector 的特殊結構。
 
@@ -726,17 +732,15 @@ ModReLU 則主要調整幅度，保留相位方向，因此更符合複數訊號
 
 因為真實 target 滿足：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5CIm%28a_0%29%2C%5Cdots%2C%5CIm%28a_8%29%3D0" alt="front imaginary zero">
-</p>
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?a_9%3D0" alt="a9 zero">
-</p>
+$\Im(a_0), \dots, \Im(a_8) = 0$
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?%5CRe%28a_%7B10%7D%29%2C%5Cdots%2C%5CRe%28a_%7B18%7D%29%3D0" alt="back real zero">
-</p>
+
+$a_9 = 0$
+
+
+$\Re(a_{10}), \dots, \Re(a_{18}) = 0$
+
 
 若模型在這些位置產生不該存在的分量，應該被額外懲罰。
 
@@ -746,7 +750,7 @@ ModReLU 則主要調整幅度，保留相位方向，因此更符合複數訊號
 
 ```mermaid
 flowchart TD
-    A["模型預測向量 â"]
+    A["模型預測向量 a_hat"]
     --> B["實部資訊區誤差<br/>Real-region Loss"]
     A --> C["虛部資訊區誤差<br/>Imag-region Loss"]
     A --> D["非法分量懲罰<br/>Leakage Penalty"]
@@ -761,35 +765,35 @@ flowchart TD
 
 ---
 
-實部資訊區誤差 Real-region loss：
+實部資訊區誤差 Real-region loss:
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L_r%3DMSE%28%5CRe%28%5Chat%7Ba%7D_%7B0%3A8%7D%29%2C%5CRe%28a_%7B0%3A8%7D%29%29" alt="real loss">
-</p>
+$$
+L_r = \mathrm{MSE}(\Re(\hat{\mathbf{a}}_{0:8}), \Re(\mathbf{a}_{0:8}))
+$$
 
-虛部資訊區誤差 Imag-region loss：
+虛部資訊區誤差 Imag-region loss:
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L_i%3DMSE%28%5CIm%28%5Chat%7Ba%7D_%7B10%3A18%7D%29%2C%5CIm%28a_%7B10%3A18%7D%29%29" alt="imag loss">
-</p>
+$$
+L_i = \mathrm{MSE}(\Im(\hat{\mathbf{a}}_{10:18}), \Im(\mathbf{a}_{10:18}))
+$$
 
-非法分量懲罰 Leakage penalty：
+非法分量懲罰 Leakage penalty:
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L_%7Bleak%7D%3DMSE%28%5CIm%28%5Chat%7Ba%7D_%7B0%3A8%7D%29%2C0%29%2BMSE%28%5CRe%28%5Chat%7Ba%7D_%7B10%3A18%7D%29%2C0%29" alt="leakage loss">
-</p>
+$$
+L_{leak} = \mathrm{MSE}(\Im(\hat{\mathbf{a}}_{0:8}), 0) + \mathrm{MSE}(\Re(\hat{\mathbf{a}}_{10:18}), 0)
+$$
 
-結構零點懲罰 Structural-zero penalty：
+結構零點懲罰 Structural-zero penalty:
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L_%7Bzero%7D%3D%7C%5Chat%7Ba%7D_9%7C%5E2" alt="zero loss">
-</p>
+$$
+L_{zero} = |\hat{a}_9|^2
+$$
 
 總損失：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?L%3DL_r%2BL_i%2B%5Clambda_1L_%7Bleak%7D%2B%5Clambda_2L_%7Bzero%7D%2B%5Clambda_3L_%7BL1%7D" alt="total loss">
-</p>
+$$
+L = L_r + L_i + \lambda_1 L_{leak} + \lambda_2 L_{zero} + \lambda_3 L_{L1}
+$$
 
 ---
 
@@ -867,7 +871,7 @@ Curriculum learning 由簡單到困難：
 
 | 指標 | 公式 | 意義 |
 |---|---|---|
-| EVM | $\(10\log_{10}\frac{E(\lvert a-a\^2)}{E(\lvert a^2)}\)$ | 通訊常用重建品質 |
+| EVM | 見下方公式 | 通訊常用重建品質 |
 | Structured SER | sign 判決錯誤率 | 對應 QPSK symbol error |
 | Structured BER | bit sign 判決錯誤率 | 對應 QPSK bit error |
 
@@ -875,9 +879,8 @@ Curriculum learning 由簡單到困難：
 
 EVM 定義為：
 
-<p align="center">
-  <img src="https://latex.codecogs.com/svg.image?EVM_%7BdB%7D%3D10%5Clog_%7B10%7D%5Cleft%28%5Cfrac%7B%5Cmathbb%7BE%7D%5B%7C%5Chat%7B%5Cmathbf%7Ba%7D%7D-%5Cmathbf%7Ba%7D%7C%5E2%5D%7D%7B%5Cmathbb%7BE%7D%5B%7C%5Cmathbf%7Ba%7D%7C%5E2%5D%7D%5Cright%29" alt="EVM dB">
-</p>
+
+$EVM_{dB} = 10\log_{10}\left(\frac{\mathbb{E}[|\hat{\mathbf{a}} - \mathbf{a}|^2]}{\mathbb{E}[|\mathbf{a}|^2]}\right)$
 
 EVM 越低代表重建品質越好。
 
@@ -885,8 +888,8 @@ EVM 越低代表重建品質越好。
 
 Structured SER 根據 target vector 的有效分量進行符號判決：
 
-- 前半部使用 \(\Re(a_0),...,\Re(a_8)\)
-- 後半部使用 \(\Im(a_{10}),...,\Im(a_{18})\)
+- 前半部使用 $\Re(a_0), ..., \Re(a_8)$
+- 後半部使用 $\Im(a_{10}), ..., \Im(a_{18})$
 
 若任一 QPSK symbol 的 real 或 imaginary sign 判錯，則視為 symbol error。
 
@@ -908,7 +911,7 @@ Structured SER 根據 target vector 的有效分量進行符號判決：
    代表雜訊降低時，模型回歸誤差也下降，符合通訊系統直覺。
 
 2. **EVM 隨 SNR 提升而改善**  
-   EVM 從低 SNR 的較高誤差逐漸降低，表示 `â` 越接近真實 `a`。
+    EVM 從低 SNR 的較高誤差逐漸降低，表示 $\hat{\mathbf{a}}$ 越接近真實 $\mathbf{a}$。
 
 3. **Structured SER / BER 目前皆為 0**  
    表示模型已能正確恢復 QPSK symbol 的正負號結構。
